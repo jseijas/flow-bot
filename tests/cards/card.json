@@ -1,0 +1,4 @@
+{
+  "greet": "Hello",
+  "greetUser": "Hello {{ user.name }}, how are you today?"
+}

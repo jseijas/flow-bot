@@ -1,0 +1,52 @@
+{
+  "name": "flow-bot",
+  "version": "1.0.0",
+  "description": "Flow Bot Framework",
+  "main": "lib/index.js",
+  "scripts": {
+    "compile": "babel --presets es2015 -d lib/ src/",
+    "prepublish": "npm run compile",
+    "test": "mocha --compilers js:babel-core/register tests/**/*.js",
+    "lint": "eslint src/**"
+  },
+  "author": {
+    "email": "jseijas@gmail.com",
+    "name": "Jesus Seijas",
+    "url": "https://github.com/jseijas"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jseijas/flow-bot/issues"
+  },
+  "maintainers": [
+    {
+      "email": "jseijas@gmail.com",
+      "name": "jseijas"
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jseijas/flow-bot.git"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.18.0",
+    "babel-core": "^6.18.2",
+    "babel-preset-es2015": "^6.18.0",
+    "chai": "^3.5.0",
+    "mocha": "^3.2.0"
+  },
+  "dependencies": {
+    "@slack/client": "^3.9.0",
+    "apiai": "^4.0.1",
+    "async": "^2.2.0",
+    "botbuilder": "^3.7.0",
+    "glob": "^7.1.1",
+    "i18n": "^0.8.3",
+    "jfs": "^0.2.6",
+    "lodash": "^4.17.4",
+    "moment": "^2.18.1",
+    "node-wit": "^4.2.0",
+    "request": "^2.81.0",
+    "uuid": "^3.0.1"
+  }
+}
