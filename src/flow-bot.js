@@ -127,9 +127,17 @@ class FlowBot {
     return path.normalize(path.join(process.cwd(),relative));
   }
 
+  isPrompt(item) {
+    return ((item.type === 'prompt') || ((item.prompt) && (item.prompt !== '')));
+  }
+
+  isChoice(item) {
+    return this.isPrompt(item) && item.prompt === 'choice';
+  }
+
   addCard(item) {
     this.cardManager.addItem(item);
-    if (item.type === 'prompt' && item.prompt === 'choice' && _.isString(item.options)) {
+    if (this.isChoice(item) && _.isString(item.options)) {
       let tokens = item.options.split('|');
       item.options = [];
       for (let j = 0; j < tokens.length; j++) {
@@ -148,7 +156,7 @@ class FlowBot {
         }
         for (let name in this.cardManager.items) {
           let item = this.cardManager.items[name];
-          if (item.type === 'prompt' && item.prompt === 'choice' && _.isString(item.options)) {
+          if (this.isChoice(item) && _.isString(item.options)) {
             let tokens = item.options.split('|');
             item.options = [];
             for (let j = 0; j < tokens.length; j++) {
@@ -246,7 +254,7 @@ class FlowBot {
         } else {
           actionArr.push(this.sendCard.bind(this, current));
           let card = this.cardManager.getItem(current);
-          if (card.type === 'prompt') {
+          if (this.isPrompt(card)) {
             actionArr.push(this.reactToPrompt.bind(this));
           }
         }
@@ -308,7 +316,7 @@ class FlowBot {
     if (session.dialogData.view && session.dialogData.view.user && session.dialogData.view.user.locale) {
       locale = session.dialogData.view.user.locale;
     }
-    let isPrompt = (card.type === 'prompt');
+    let isPrompt = this.isPrompt(card);
     card = this.renderFactory.render(session, card, locale, session.dialogData.view);
     if (!isPrompt) {
       session.send(card);

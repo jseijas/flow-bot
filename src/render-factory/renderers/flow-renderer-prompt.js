@@ -10,18 +10,6 @@ class FlowRendererPrompt extends FlowRenderer {
   }
 
   /**
-   * Choice renderer.
-   */
-  renderChoice(session, card) {
-    let options = [];
-    for (let i = 0; i < card.options.length; i++) {
-      options.push(card.options[i].text);
-    }
-    let style = card.style ? { listStyle: this.builder.ListStyle[card.style] } : undefined;
-    return this.builder.Prompts.choice(session, card.text, options, style);
-  }
-
-  /**
    * Transform the given card to the message builder.
    * 
    * @param { Object } session Chat session for building the message.
@@ -29,11 +17,7 @@ class FlowRendererPrompt extends FlowRenderer {
    */
   transform(session, card) {
     let promptType = card.prompt ? card.prompt : 'text';
-    if (promptType === 'choice') {
-      return this.renderChoice(session, card);
-    } else {
-      return this.builder.Prompts[promptType](session, card.text);
-    }
+    return this.launchPrompt(session, card);
   }
 }
 

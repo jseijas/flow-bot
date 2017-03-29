@@ -36,6 +36,29 @@ class FlowRenderer {
   }
 
   /**
+   * Indicates if the card is a prompt.
+   * 
+   * @param { Object } card Input card.
+   * @returns { Boolean } True if the card is a prompt, false otherwise. 
+   */
+  containsPrompt(card) {
+    return (card.prompt && card.prompt !== '');
+  }
+
+  launchPrompt(session, card) {
+    if (card.prompt === 'choice') {
+      let options = [];
+      for (let i = 0; i < card.options.length; i++) {
+        options.push(card.options[i].text);
+      }
+      let style = card.style ? { listStyle: this.builder.ListStyle[card.style] } : undefined;
+      return this.builder.Prompts.choice(session, card.text, options, style);
+    } else {
+      return this.builder.Prompts[card.prompt](session, card.text);
+    }
+  }
+
+  /**
    * Render a card to the given session.
    * 
    * @param { Object } session Chat session for building the message.
@@ -46,7 +69,11 @@ class FlowRenderer {
   render(session, card, locale, variables) {
     let translatedCard = this.translate(card, locale, variables);
     session.dialogData.lastCard = translatedCard;
-    return this.transform(session, translatedCard);
+    let result = this.transform(session, translatedCard);
+    if ((this.containsPrompt(translatedCard)) && (translatedCard.type !== 'prompt')) {
+      this.launchPrompt(session, translatedCard);
+    }
+    return result;
   }
 }
 

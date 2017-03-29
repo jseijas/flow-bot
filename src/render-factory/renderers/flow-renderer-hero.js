@@ -13,7 +13,11 @@ class FlowRendererHero extends FlowRenderer {
   static buildCard(builder, session, card) {
     let result;
     if (card.type === 'hero') {
-      result = new builder.HeroCard(session);
+      if (card.isThumbnail === true) {
+      result = new builder.ThumbnailCard(session);
+      } else {
+        result = new builder.HeroCard(session);
+      }
     } else if (card.type === 'thumbnail') {
       result = new builder.ThumbnailCard(session);
     } else {
