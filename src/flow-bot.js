@@ -10,6 +10,7 @@ import FlowTemplate from './template/flow-template';
 class FlowBot {
   constructor(settings) {
     this.settings = settings || {};
+    this.setDefaultSettings();
     this.observers = {};
     this.builder = builder;
     this.createStorage();
@@ -38,6 +39,24 @@ class FlowBot {
         }.bind(this));
       }.bind(this));
     }.bind(this));
+  }
+
+  setDefaultSettings() {
+    if (!this.settings.localesPath) {
+      this.settings.localesPath = './bot/locales';
+    }
+    if (!this.settings.defaultLocale) {
+      this.settings.defaultLocale = 'en';
+    }
+    if (!this.settings.cardPath) {
+      this.settings.cardPath = './bot/cards';
+    }
+    if (!this.settings.actionPath) {
+      this.settings.actionPath = './bot/actions';
+    }
+    if (!this.settings.dialogPath) {
+      this.settings.dialogPath = './bot/dialogs';
+    }
   }
 
   log(level, message) {
