@@ -7,7 +7,14 @@ import FlowMultiConnector from './connector/flow-multi-connector';
 import FlowRequireManager from './require-manager/flow-require-manager';
 import FlowTemplate from './template/flow-template';
 
+/**
+ * Class for a bot using the Flow Bot Framework.
+ */
 class FlowBot {
+
+  /**
+   * Constructor of the class.
+   */
   constructor(settings) {
     this.settings = settings || {};
     this.setDefaultSettings();
@@ -48,14 +55,17 @@ class FlowBot {
     if (!this.settings.defaultLocale) {
       this.settings.defaultLocale = 'en';
     }
+    if (!this.settings.botPath) {
+      this.settings.botPath = './bot';
+    }
     if (!this.settings.cardPath) {
-      this.settings.cardPath = './bot/cards';
+      this.settings.cardPath = this.settings.botPath + '/cards';
     }
     if (!this.settings.actionPath) {
-      this.settings.actionPath = './bot/actions';
+      this.settings.actionPath = this.settings.botPath + '/actions';
     }
     if (!this.settings.dialogPath) {
-      this.settings.dialogPath = './bot/dialogs';
+      this.settings.dialogPath = this.settings.botPath + '/dialogs';
     }
   }
 
