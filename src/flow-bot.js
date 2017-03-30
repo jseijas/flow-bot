@@ -43,8 +43,19 @@ class FlowBot {
             this.log('error', err);
           }
           this.buildDialogs();
-          if (cb) {
-            cb();
+          if (this.constructorMethod) {
+            this.constructorMethod.method.bind(this)(function(err){
+              if (err) {
+                this.log('error', err);
+              }
+              if (cb) {
+                cb();
+              }
+            });
+          } else {
+            if (cb) {
+              cb();
+            }
           }
         }.bind(this));
       }.bind(this));
@@ -200,7 +211,7 @@ class FlowBot {
   addAction(item) {
     let action = {
       name: item.name,
-      text: item.source
+      text: item.sourcec
     };
     this.actionManager.addItem(action);
   }
@@ -209,7 +220,17 @@ class FlowBot {
     this.log('info', 'Loading actions from folder');
     if (this.settings.actionPath) {
       this.log('info', `Loading action from folder ${this.settings.actionPath}`);
-      this.actionManager.addFolder(this.settings.actionPath, cb);
+      this.actionManager.addFolder(this.settings.actionPath, function(err) {
+        if (err) {
+          return cb(err);
+        }
+        let constructorMethod = this.actionManager.getItem('constructor');
+        if (constructorMethod && constructorMethod.method) {
+          this.actionManager.removeItem('constructor');
+          this.constructorMethod = constructorMethod;
+        }
+        return cb(); 
+      }.bind(this));
     } else {
       this.log('info', 'No action folder defined');
       cb();
@@ -276,6 +297,10 @@ class FlowBot {
         } else if (current.endsWith('()')) {
           current = current.substring(0, current.length-2);
           let action = this.actionManager.getItem(current);
+          if (!action || !action.method) {
+            this.log('error', 'Action '+current+' does not exists');
+            return;
+          } 
           actionArr.push(action.method.bind(this));
         } else {
           actionArr.push(this.sendCard.bind(this, current));
@@ -348,6 +373,10 @@ class FlowBot {
       session.send(card);
       next();
     }
+  }
+
+  getDialog(name) {
+    return this.bot.dialog(name);
   }
 
   endDialog(session, args, next) {

@@ -27,7 +27,7 @@ class FlowRequireManager {
 
   removeItem(name) {
     this.log('info', `Removing item ${name}`);
-    delete this.cards[name];
+    delete this.items[name];
   }
 
   getItem(name) {
