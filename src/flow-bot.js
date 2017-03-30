@@ -15,7 +15,7 @@ class FlowBot {
   /**
    * Constructor of the class.
    */
-  constructor(settings) {
+  constructor(settings, cb) {
     this.settings = settings || {};
     this.setDefaultSettings();
     this.observers = {};
@@ -43,20 +43,23 @@ class FlowBot {
             this.log('error', err);
           }
           this.buildDialogs();
+          if (cb) {
+            cb();
+          }
         }.bind(this));
       }.bind(this));
     }.bind(this));
   }
 
   setDefaultSettings() {
-    if (!this.settings.localesPath) {
-      this.settings.localesPath = './bot/locales';
-    }
     if (!this.settings.defaultLocale) {
       this.settings.defaultLocale = 'en';
     }
     if (!this.settings.botPath) {
       this.settings.botPath = './bot';
+    }
+    if (!this.settings.localesPath) {
+      this.settings.localesPath = this.settings.botPath + '/locales';
     }
     if (!this.settings.cardPath) {
       this.settings.cardPath = this.settings.botPath + '/cards';
@@ -72,6 +75,8 @@ class FlowBot {
   log(level, message) {
     if (this.settings.logger) {
       this.settings.logger.log(level, message);
+    } else {
+      console.log(level.toUpperCase() + ': ' + message);
     }
   }
 
@@ -86,7 +91,12 @@ class FlowBot {
         localesPath: this.settings.localesPath,
         defaultLocale: this.settings.defaultLocale
       };
-      this.settings.template = new FlowTemplate(opts);
+      try {
+        this.settings.template = new FlowTemplate(opts);
+      } catch (err) {
+        this.log('error', 'Error creating template and locales');
+        this.log('error', err);
+      }
     }
     this.template = this.settings.template;
     delete this.settings['template'];
@@ -107,6 +117,11 @@ class FlowBot {
         appPassword: pass
       });
       this.connector.addConnector('default', microsoftConnector);
+    }
+    if (this.settings.consoleConnector === true) {
+      let consoleConnector = new builder.ConsoleConnector();
+      this.connector.addConnector('console', consoleConnector);
+      consoleConnector.listen();
     }
   }
 
@@ -257,6 +272,7 @@ class FlowBot {
       if (current !== '') {
         if (current[0] === '/') {
           actionArr.push(this.beginDialog.bind(this, current));
+          actionArr.push(this.getVariables.bind(this));
         } else if (current.endsWith('()')) {
           current = current.substring(0, current.length-2);
           let action = this.actionManager.getItem(current);
