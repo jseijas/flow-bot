@@ -23,7 +23,7 @@ class FlowRecognizerLuis extends FlowRecognizer{
    * @param { String } model Correct model for the recognition.
    * @param { Function } cb Callback Function.
    */
-  recognizeUterrance(utterance, model, cb) {
+  recognizeUtterance(utterance, model, cb) {
     try {
       let uri = model.trim();
       if (uri.lastIndexOf('&q=') != uri.length -3) {
