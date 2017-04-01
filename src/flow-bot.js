@@ -29,34 +29,41 @@ class FlowBot {
     this.cardManager = new FlowRequireManager({ logger: settings.logger, pattern: '*.json' });
     this.actionManager = new FlowRequireManager({ logger: settings.logger, pattern: '*.js' });
     this.dialogManager = new FlowRequireManager({ logger: settings.logger, pattern: '*.flow' });
+    this.pluginManager = new FlowRequireManager({ logger: settings.logger, pattern: '*.js'});
     this.createCards(function(err) {
       if (err) {
         this.log('error', err);
       }
-      this.log('now will load actions');
-      this.createActions(function(err) {
+      this.log('info','now will load plugins');
+      this.createPlugins(function(err) {
         if (err) {
           this.log('error', err);
         }
-        this.createDialogs(function(err) {
+        this.log('info', 'now will load actions');
+        this.createActions(function(err) {
           if (err) {
             this.log('error', err);
           }
-          this.buildDialogs();
-          if (this.constructorMethod) {
-            this.constructorMethod.method.bind(this)(function(err){
-              if (err) {
-                this.log('error', err);
-              }
+          this.createDialogs(function(err) {
+            if (err) {
+              this.log('error', err);
+            }
+            this.buildDialogs();
+            if (this.constructorMethod) {
+              this.constructorMethod.method.bind(this)(function(err){
+                if (err) {
+                  this.log('error', err);
+                }
+                if (cb) {
+                  cb();
+                }
+              });
+            } else {
               if (cb) {
                 cb();
               }
-            });
-          } else {
-            if (cb) {
-              cb();
             }
-          }
+          }.bind(this));
         }.bind(this));
       }.bind(this));
     }.bind(this));
@@ -77,6 +84,9 @@ class FlowBot {
     }
     if (!this.settings.actionPath) {
       this.settings.actionPath = this.settings.botPath + '/actions';
+    }
+    if (!this.settings.pluginPath) {
+      this.settings.pluginPath = this.settings.botPath + '/plugins';
     }
     if (!this.settings.dialogPath) {
       this.settings.dialogPath = this.settings.botPath + '/dialogs';
@@ -237,6 +247,30 @@ class FlowBot {
     }
   }
 
+  createPlugins(cb) {
+    this.log('info', 'Loading plugins from folder');
+    if (this.settings.pluginPath) {
+      this.log('info', `Loading plugins from folder ${this.settings.pluginPath}`);
+      this.pluginManager.addFolder(this.settings.pluginPath, function(err) {
+        if (err) {
+          return cb(err);
+        }
+        for (var key in this.pluginManager.items) {
+          try {
+            let plugin = this.pluginManager.items[key];
+            plugin.instance = new plugin.method(this); 
+          } catch (err) {
+            this.log('error', 'Error creating plugin '+key);
+          }
+        }
+        return cb(); 
+      }.bind(this));
+    } else {
+      this.log('info', 'No plugin folder defined');
+      cb();
+    }
+  }
+
   addDialog(item) {
     this.dialogManager.addItem(item);
   }
@@ -349,6 +383,7 @@ class FlowBot {
   }
 
   getVariables(session, args, next) {
+    session.dialogData.args = args;
     session.dialogData.view = {};
     session.dialogData.view.message = session.message;
     this.storage.getAllFromCollection('user', session.message.address.user.id, function(err, values) {
@@ -421,6 +456,14 @@ class FlowBot {
     }
   }
 
+  getPlugin(name) {
+    let plugin = this.pluginManager.getItem(name);
+    if (plugin && plugin.instance) {
+      return plugin.instance;
+    }
+    return undefined;
+  }
+
   reactToPrompt(session, args, next) {
     let prompt = session.dialogData.lastCard;
     let response = this.getResponse(prompt, args.response);
@@ -464,6 +507,27 @@ class FlowBot {
       this.endReactToPrompt(session, prompt, value, next);
     }
   }
+
+  findEntity(intent, name) {
+    return this.builder.EntityRecognizer.findEntity(intent.entities, name);
+  } 
+
+  resolveTime(intent) {
+    if (intent.entities) {
+      return this.builder.EntityRecognizer.resolveTime(intent.entities);
+    } else {
+      return this.builder.EntityRecognizer.resolveTime([intent]);
+    }
+  }
+
+  parseTime(utterance) {
+    return this.builder.EntityRecognizer.parseTime(utterance);
+  }
+  
+  findBestMatch(items, name) {
+    return this.builder.EntityRecognizer.findBestMatch(items, name);
+  }
+
 }
 
 export default FlowBot;

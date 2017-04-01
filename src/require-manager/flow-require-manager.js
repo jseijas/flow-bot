@@ -50,19 +50,20 @@ class FlowRequireManager {
         }
         if (content) {
           if (!_.isArray(content)) {
-            if (!content.name) {
-              let name = path.basename(files[i], extension).toLowerCase();
-              if (_.isFunction(content)) {
-                content = {
-                  method: content
-                };
-              } else if (_.isString(content)) {
-                content = {
-                  text: content
-                };
-              }
-              content.name = name;
+            let name = content.name;
+            if (_.isFunction(content)) {
+              content = {
+                method: content
+              };
+            } else if (_.isString(content)) {
+              content = {
+                text: content
+              };
             }
+            if (!name) {
+              name = path.basename(files[i], extension).toLowerCase();
+            }
+            content.name = name;
             content = [content];
           }
           for (let j = 0; j < content.length; j++) {
