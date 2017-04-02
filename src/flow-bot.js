@@ -399,7 +399,12 @@ class FlowBot {
   }
 
   sendCard(name, session, args, next) {
-    let card = this.cardManager.getItem(name);
+    let card;
+    if (_.isString(name)) {
+      card = this.cardManager.getItem(name);
+    } else {
+      card = name;
+    }
     let locale = session.userData.locale || this.settings.defaultLocale || 'en';
     let isPrompt = this.isPrompt(card);
     card = this.renderFactory.render(session, card, locale, session.dialogData.view);
