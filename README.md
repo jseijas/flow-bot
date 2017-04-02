@@ -2,7 +2,7 @@
 
 The Flow Bot Framework is based on the Microsoft Bot Framework, but including some cool features and a way of defining the bots only describing the cards to the user and the dialog flow.
 
-You can find an example of use at: https://github.com/jseijas/flow-bot-example/
+You can find examples of use at: https://github.com/jseijas/flow-bot-examples/
 
 * Persistance: A Persistance layer is added with the flow-storage component. Default storages developed are: memory, json files, loopback model. You can implement your own storages only implementing the FlowStorage abstract class.
 * i18n: A translation module is added. Instead of using "tag constants" you can use directly a default language.
@@ -78,7 +78,7 @@ At the options we can see the difference between the text that is shown to the u
 The Flow Bot Framework is available via NPM.
 
 ```bash
-npm install --save flow-bot-manager
+npm install --save flow-bot
 ```
 You can use express, loopback, hapi, restify... to expose your bot API as a service. In this example we use restify:
 ```bash
@@ -88,7 +88,7 @@ npm install --save restify
 And then you can create a bot folder with your bot behaviour (cards, actions, dialogs, and translations), and put the following code in the index.js to create the bot:
 
 ```javascript
-const BotManager = require('flow-bot-manager').default;
+const BotManager = require('flow-bot').default;
 const restify = require('restify');
 
 var server = restify.createServer();
@@ -97,14 +97,50 @@ server.listen(process.env.port || process.env.PORT || 3978, function () {
 });
 var opts = {
   defaultLocale: 'en',
-  localesPath: './bot/locales',
-  cardPath: './bot/cards',
-  actionPath: './bot/actions',
-  dialogPath: './bot/dialogs'
+  botPath: './bot'
 };
 server.botManager = new BotManager(opts);
 server.post('/api/messages', server.botManager.connector.listen());
 ```
+
+## Creating a bot with the yeoman generator
+
+First, install [Yeoman](http://yeoman.io) and generator-flowbot using [npm](https://www.npmjs.com/) (we assume you have pre-installed [node.js](https://nodejs.org/)).
+
+```bash
+npm install -g yo
+npm install -g generator-flowbot
+```
+
+Then generate your new project:
+
+```bash
+yo flowbot
+```
+
+Then you'll be able to create cards. A card is an interaction with the user:
+
+```bash
+yo flowbot:card
+```
+
+You can also create actions. An action is a javascript function that can be executed in a dialog pipeline:
+
+```bash
+yo flowbot:action
+```
+
+You can also create plugins. A plugin is a class that is instantiated as a singleton, and can be used by all the actions of the bot:
+
+```bash
+yo flowbot:plugin
+```
+
+## Plugins
+
+A plugin is defined as a class that is automaticaly instantiated as singleton, and that can be use anywhere in the code. You've one example of use in the example of natural language processing, where there is a plugin for the Alarm Service, so alarms can be created or removed form any point of the application, and also as being instantiated as singleton, it host a timer that triggers the alarms.
+
+https://github.com/jseijas/flow-bot-examples/tree/master/bots/basics-naturalLanguage
 
 ## Test your bot 
 
