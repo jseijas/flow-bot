@@ -72,7 +72,7 @@ class Wolfram {
           text: "I am not able to give you a result :("
         });
       }
-      if (!result.sucess) {
+      if (!result.success) {
         if (result.didyoumean) {
           return cb(null, {
             type: "text",
