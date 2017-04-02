@@ -18,6 +18,9 @@ import FlowRequireManager from './require-manager/flow-require-manager';
 import FlowRenderer from './render-factory/flow-renderer';
 import FlowRenderFactory from './render-factory/flow-render-factory';
 
+// Language
+import Language from './language/language';
+
 // Recognizers
 import FlowRecognizer from './recognizer/flow-recognizer';
 import FlowRecognizerApiai from './recognizer/flow-recognizer-apiai';
@@ -50,6 +53,9 @@ export { FlowRequireManager };
 // Renderers
 export { FlowRenderer };
 export { FlowRenderFactory };
+
+// Language
+export { Language };
 
 // Recognizers
 export { FlowRecognizer };

@@ -1,6 +1,6 @@
 {
   "name": "flow-bot",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "Flow Bot Framework",
   "main": "lib/index.js",
   "scripts": {
@@ -40,6 +40,7 @@
     "apiai": "^4.0.1",
     "async": "^2.2.0",
     "botbuilder": "^3.7.0",
+    "franc": "^3.0.0",
     "glob": "^7.1.1",
     "i18n": "^0.8.3",
     "jfs": "^0.2.6",

@@ -6,6 +6,7 @@ import FlowStorage from './storage/flow-storage';
 import FlowMultiConnector from './connector/flow-multi-connector';
 import FlowRequireManager from './require-manager/flow-require-manager';
 import FlowTemplate from './template/flow-template';
+import Language from './language/language';
 
 /**
  * Class for a bot using the Flow Bot Framework.
@@ -17,6 +18,7 @@ class FlowBot {
    */
   constructor(settings, cb) {
     this.settings = settings || {};
+    this.languageManager = new Language();
     this.setDefaultSettings();
     this.observers = {};
     this.builder = builder;
@@ -398,10 +400,7 @@ class FlowBot {
 
   sendCard(name, session, args, next) {
     let card = this.cardManager.getItem(name);
-    let locale = 'en';
-    if (session.dialogData.view && session.dialogData.view.user && session.dialogData.view.user.locale) {
-      locale = session.dialogData.view.user.locale;
-    }
+    let locale = session.userData.locale || this.settings.defaultLocale || 'en';
     let isPrompt = this.isPrompt(card);
     card = this.renderFactory.render(session, card, locale, session.dialogData.view);
     if (!isPrompt) {
@@ -528,6 +527,13 @@ class FlowBot {
     return this.builder.EntityRecognizer.findBestMatch(items, name);
   }
 
+  guessLanguages(utterance, whitelist, limit) {
+    return this.languageManager.guess(utterance, whitelist, limit);
+  }
+
+  guessLanguage(utterance, whitelist) {
+    return this.languageManager.guess(utterance, whitelist, 1)[0];
+  }
 }
 
 export default FlowBot;
