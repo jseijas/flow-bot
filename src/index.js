@@ -33,6 +33,9 @@ import FlowConnectorSlack from './connector/flow-connector-slack';
 import FlowConnectorFacebook from './connector/flow-connector-facebook';
 import FlowMultiConnector from './connector/flow-multi-connector';
 
+// Smart
+import Wolfram from './smart/wolfram';
+
 // Flow Bot
 import FlowBot from './flow-bot';
 
@@ -68,6 +71,9 @@ export { FlowConnector };
 export { FlowConnectorSlack };
 export { FlowConnectorFacebook };
 export { FlowMultiConnector };
+
+// Smart
+export { Wolfram };
 
 // Flow Bot
 export { FlowBot };
