@@ -28,8 +28,17 @@ class Wolfram {
         if (status.error !== 'false') {
           return cb('Error querying wolfram');
         }
+        if (status.success === 'false') {
+          if (queryresult['didyoumeans']) {
+            let didyoumean = queryresult['didyoumeans'][0].didyoumean[0]['_'];
+            return cb(undefined, { success: false, didyoumean: didyoumean })
+          } else {
+            return cb(undefined, { success: false });            
+          }
+        }
         let podarr = queryresult['pod'];
         let pods = [];
+        let primary;
         for (let i = 0; i < podarr.length; i++) {
           let currentpod = podarr[i];
           let pod = {
@@ -45,22 +54,38 @@ class Wolfram {
               image: currentsubpod.img[0]['$'].src
             });
           }
+          if (pod.primary) {
+            primary = pod;
+          }
           pods.push(pod);
         }
-        return cb(undefined, pods);
+        return cb(undefined, { primary: primary, pods: pods, success: true });
       });
     });
   }
 
   queryAsCard(input, cb) {
-    this.query(input, function(err, pods) {
+    this.query(input, function(err, result) {
       if (err) {
         return cb(null, {
           type: "text",
           text: "I am not able to give you a result :("
         });
       }
-      let pod = pods[0];
+      if (!result.sucess) {
+        if (result.didyoumean) {
+          return cb(null, {
+            type: "text",
+            text: "Perhaps you mean \""+result.didyoumean+"\""
+          });
+        } else {
+          return cb(null, {
+            type: "text",
+            text: "I am not able to give you a result :("
+          });
+        }
+      }
+      let pod = result.primary;
       let card = {
         type: 'hero',
         title: pod.title
