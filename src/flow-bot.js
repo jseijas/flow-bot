@@ -338,6 +338,7 @@ class FlowBot {
             return;
           } 
           actionArr.push(action.method.bind(this));
+          actionArr.push(this.getVariables.bind(this));
         } else {
           actionArr.push(this.sendCard.bind(this, current));
           let card = this.cardManager.getItem(current);
