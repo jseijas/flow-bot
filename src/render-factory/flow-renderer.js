@@ -1,3 +1,5 @@
+import _ from 'lodash';
+
 /**
  * Abstract class for a renderer.
  */
@@ -47,6 +49,13 @@ class FlowRenderer {
 
   launchPrompt(session, card) {
     if (card.prompt === 'choice') {
+      if (_.isString(card.optionsStr)) {
+        let tokens = card.optionsStr.split('|');
+        card.options = [];
+        for (let j = 0; j < tokens.length; j++) {
+          card.options.push({ tag: tokens[j], text: tokens[j] });
+        }
+      }
       let options = [];
       for (let i = 0; i < card.options.length; i++) {
         options.push(card.options[i].text);

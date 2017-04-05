@@ -390,7 +390,7 @@ class FlowBot {
     session.dialogData.view.message = session.message;
     this.storage.getAllFromCollection('user', session.message.address.user.id, function(err, values) {
       session.dialogData.view.user = values;
-      next();
+      next(args);
     });
   }
 
@@ -511,6 +511,33 @@ class FlowBot {
       this.endReactToPrompt(session, prompt, value, next);
     }
   }
+
+  getUserVariable(session, name) {
+    if (!session.dialogData.view.user) {
+      return undefined;
+    }
+    return session.dialogData.view.user[name];
+  }
+
+  setUserVariable(session, name, value, cb) {
+    let key = session.message.address.user.id;
+    if (!session.dialogData.view.user) {
+      session.dialogData.view.user = {};
+    }
+    session.dialogData.view.user[name] = value;
+    this.storage.setToCollection('user', key, name, value, cb);
+  }
+
+  getVariables(session, args, next) {
+    session.dialogData.args = args;
+    session.dialogData.view = {};
+    session.dialogData.view.message = session.message;
+    this.storage.getAllFromCollection('user', session.message.address.user.id, function(err, values) {
+      session.dialogData.view.user = values;
+      next();
+    });
+  }
+
 
   findEntity(intent, name) {
     return this.builder.EntityRecognizer.findEntity(intent.entities, name);
