@@ -1,6 +1,6 @@
 {
   "name": "flow-bot",
-  "version": "1.0.16",
+  "version": "1.0.17",
   "description": "Flow Bot Framework",
   "main": "lib/index.js",
   "scripts": {

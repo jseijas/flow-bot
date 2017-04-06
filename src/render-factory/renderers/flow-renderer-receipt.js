@@ -9,7 +9,7 @@ class FlowRendererReceipt extends FlowRenderer {
     this.type = 'receipt';
   }
 
-  setTile(msg, card) {
+  setTitle(msg, card) {
     if (card.title) {
       msg.title(card.title);
     }
@@ -30,7 +30,7 @@ class FlowRendererReceipt extends FlowRenderer {
   setFacts(session, msg, card) {
     if (card.facts && card.facts.length > 0) {
       let facts = [];
-      for (let i = 0; i < card.facts; i++) {
+      for (let i = 0; i < card.facts.length; i++) {
         let fact = this.builder.Fact.create(session, card.facts[i].value, card.facts[i].key);
         facts.push(fact);
       }
@@ -41,7 +41,7 @@ class FlowRendererReceipt extends FlowRenderer {
   setItems(session, msg, card) {
     if (card.items && card.items.length > 0) {
       let items = [];
-      for (let i = 0; i < card.items; i++) {
+      for (let i = 0; i < card.items.length; i++) {
         let item = this.builder.ReceiptItem.create(session, card.items[i].value, card.items[i].key);
         if (card.items[i].quantity) {
           item.quantity(card.items[i].quantity);
@@ -49,6 +49,7 @@ class FlowRendererReceipt extends FlowRenderer {
         if (card.items[i].image) {
           item.image(this.builder.CardImage.create(session, card.items[i].image));
         }
+        items.push(item);
       }
       msg.items(items);
     }
@@ -67,8 +68,8 @@ class FlowRendererReceipt extends FlowRenderer {
     this.setItems(session, msg, card);
     this.setTax(msg, card);
     this.setTotal(msg, card);
+    return new this.builder.Message(session).attachments([msg]);
   }
 }
 
 export default FlowRendererReceipt;
-
